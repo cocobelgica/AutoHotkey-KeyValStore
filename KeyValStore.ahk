@@ -165,7 +165,7 @@ class KeyValStore
 		Node(self, keys, value*)
 		{
 			xml_doc := self.document
-			node := xml_doc.documentElement
+			node := xml_doc.documentElement, find := true
 
 			keys_arr := (dot_prop := !IsObject(keys)) ? StrSplit(keys, ".") : keys
 			length := keys_arr.Length()
@@ -173,6 +173,9 @@ class KeyValStore
 
 			while enum.Next(i, key) {
 				if (key != "") {
+					if (find && !(node.tagName == "object"))
+						return
+
 					if (dot_prop) {
 						static tail := A_AhkVersion<"2" ? 0 : -1
 						while (SubStr(key, tail) == "\")
@@ -181,17 +184,17 @@ class KeyValStore
 
 					key := Format("{1:L}", key)
 
-					if (elem := node.selectSingleNode("*[@key='" . key . "']")) {
-						if ((i < length) && !(elem.tagName == "object"))
-							return
-						node := elem
-					} else {
-						if (!value.Length())
-							return
+					if (!find || !elem := node.selectSingleNode("*[@key='" . key . "']")) {
+						if (find) {
+							if (!value.Length()) ; Get() or Del()
+								return
+							find := false ; skip COM calls that are no longer necessary
+						}
 						elem := xml_doc.createElement(i<length ? "object" : this.TypeOf(value*))
 						elem.setAttribute("key", key)
-						node := node.appendChild(elem)
+						node.appendChild(elem)
 					}
+					node := elem
 				}
 			}
 
