@@ -122,7 +122,7 @@ class KeyValStore
 
 	Clear()
 	{
-		this.document.documentElement.selectNodes("child::node()").removeAll()
+		this.document.replaceChild(this.document.createElement("object"), this.document.documentElement)
 		this.document.save(this.Path)
 	}
 
