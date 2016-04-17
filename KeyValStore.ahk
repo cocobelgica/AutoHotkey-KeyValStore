@@ -122,8 +122,7 @@ class KeyValStore
 
 	Clear()
 	{
-		this.document.replaceChild(this.document.createElement("object"), this.document.documentElement)
-		this.document.save(this.Path)
+		this.Set("", {})
 	}
 
 	__Set(param, params*)
